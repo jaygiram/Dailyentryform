@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Report Form</title>
+    <style>
+        .hidden { display: none; }
+        .visible { display: block; }
+
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            color: #555;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        select, input[type="date"], input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
+        }
+
+        select:focus, input[type="date"]:focus, input[type="number"]:focus {
+            border-color: #66afe9;
+            outline: none;
+            box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .hidden { display: none; }
+        .visible { display: block; }
+
+        #currentTimeDisplay, #timer, #reverseTimer {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #777;
+        }
+
+        #timer span, #reverseTimer span {
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <form id="dailyReportForm"  name="Daily Report">
+        <!-- User Dropdown -->
+        <label for="user">User:</label>
+        <select id="user" name="user">
+            <option value="User 1">User 1</option>
+            <option value="User 2">User 2</option>
+        </select><br><br>
+
+        <!-- Date (Default: Current Date) -->
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" value="" readonly><br><br>
+
+        <!-- Timer showing current time -->
+        <p id="currentTimeDisplay" name="currentTime">Current time: <span id="currentTime"></span></p>
+
+           <!-- Hidden input for the current time -->
+           <input type="hidden" id="currentTimeInput" name="currentTime" value="">
+
+        <!-- Dropdown with 16 options -->
+        <label for="option1">Option 1:</label>
+        <select id="option1" name="option1">
+            <option value="Option 1">Option 1</option>
+            <option value="Option 2">Option 2</option>
+            <option value="Option 3">Option 3</option>
+            <option value="Option 4">Option 4</option>
+            <option value="Option 5">Option 5</option>
+            <option value="Option 6">Option 6</option>
+            <option value="Option 7">Option 7</option>
+            <option value="Option 8">Option 8</option>
+            <option value="Option 9">Option 9</option>
+            <option value="Option 10">Option 10</option>
+            <option value="Option 11">Option 11</option>
+            <option value="Option 12">Option 12</option>
+            <option value="Option 13">Option 13</option>
+            <option value="Option 14">Option 14</option>
+            <option value="Option 15">Option 15</option>
+            <option value="Option 16">Option 16</option>
+        </select><br><br>
+
+        <!-- Conditional Dropdown (Visible after 3 PM) -->
+        <p id="timer" class="hidden">Time left to fill this option: <span id="timeRemaining"></span></p>
+        <p id="reverseTimer" class="hidden">Countdown to disable dropdown: <span id="reverseTimeRemaining"></span></p>
+
+        <label for="conditionalOption" id="conditionalLabel" class="hidden">Conditional Option:</label>
+        <select id="conditionalOption" name="conditionalOption" class="hidden">
+            <option value="Conditional Option 1">Conditional Option 1</option>
+            <option value="Conditional Option 2">Conditional Option 2</option>
+            <option value="Conditional Option 3">Conditional Option 3</option>
+        </select><br><br>
+
+        <!-- Number Input -->
+        <label for="numberInput">Number Input:</label>
+        <input type="number" id="numberInput" name="numberInput"><br><br>
+
+        <!-- Submit and Clear Buttons -->
+        <button type="submit">Submit</button>
+        <button type="button" id="clearButton">Clear</button>
+    </form>
+
+    <script>
+        // Set current date
+        document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+// Display current time in real-time and set it in the hidden input field
+function CurrentTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
+    
+    // Update the displayed time
+    document.getElementById('currentTime').innerText = formattedTime;
+    
+    // Set the hidden input value to the current time
+    document.getElementById('currentTimeInput').value = formattedTime;
+}
+setInterval(CurrentTime, 1000); // Update every second
+
+
+
+        // Time control logic
+        const conditionalDropdown = document.getElementById('conditionalOption');
+        const conditionalLabel = document.getElementById('conditionalLabel');
+        const timer = document.getElementById('timer');
+        const reverseTimer = document.getElementById('reverseTimer');
+        const timeRemainingElement = document.getElementById('timeRemaining');
+        const reverseTimeRemainingElement = document.getElementById('reverseTimeRemaining');
+
+        const currentTime = new Date();
+        const currentHour = currentTime.getHours();
+
+        const deadline = new Date();
+        deadline.setHours(15, 0, 0); // 3:00 PM
+
+        if (currentHour >= 15) {
+            conditionalDropdown.disabled = true;
+            timer.innerText = 'The conditional dropdown is now disabled.';
+        } else {
+            conditionalDropdown.classList.add('visible');
+            conditionalLabel.classList.add('visible');
+            timer.classList.add('visible');
+            reverseTimer.classList.add('visible');
+
+            const timeLeft = deadline - currentTime;
+            const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsLeft = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            timeRemainingElement.innerText = `${hoursLeft} hours and ${minutesLeft} minutes`;
+
+            // Reverse countdown timer
+            function updateReverseTimer() {
+                const now = new Date();
+                const timeLeft = deadline - now;
+
+                if (timeLeft > 0) {
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    reverseTimeRemainingElement.innerText = `${hours}h ${minutes}m ${seconds}s`;
+                } else {
+                    conditionalDropdown.disabled = true;
+                    timer.innerText = 'The conditional dropdown is now disabled.';
+                    reverseTimeRemainingElement.innerText = "00h 00m 00s";
+                }
+            }
+
+            // Update the reverse timer every second
+            setInterval(updateReverseTimer, 1000);
+
+            setTimeout(() => {
+                conditionalDropdown.disabled = true;
+                timer.innerText = 'The conditional dropdown is now disabled.';
+                reverseTimeRemainingElement.innerText = "00h 00m 00s";
+            }, timeLeft);
+        }
+
+        // Form submission to Google Apps Script
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwP_syjcppF32vHz7OQVFgYUaNtOkELJ457M5M3bZ46N3ki5jHuR8uKQJ4fCxFYr4oY/exec";
+        
+        document.getElementById("dailyReportForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+
+    fetch(scriptURL, { method: "POST", body: formData })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Form submitted successfully:", data);
+            alert("Form submitted successfully");
+        })
+        .catch(error => {
+            console.error("Error! Failed to fetch:", error.message);
+            alert(`Error! Failed to fetch: ${error.message}`);
+        });
+});
+
+
+        // Clear Button logic
+        document.getElementById("clearButton").addEventListener("click", function() {
+    // Store the default date
+    const defaultDate = document.getElementById("date").value;
+
+    // Clear the form
+    document.getElementById("dailyReportForm").reset();
+
+    // Restore the default date after reset
+    document.getElementById("date").value = defaultDate;
+
+    // The current time will continue updating, so no need to restore it
+});
+
+    </script>
+</body>
+</html>
+
