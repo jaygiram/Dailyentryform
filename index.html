@@ -407,153 +407,172 @@
     </form>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Set current date
-            document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+      document.addEventListener('DOMContentLoaded', function () {
+    // Set current date
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
 
-            // Display current time in real-time and set it in the hidden input field
-            function CurrentTime() {
-                const now = new Date();
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const seconds = now.getSeconds().toString().padStart(2, '0');
-                const formattedTime = `${hours}:${minutes}:${seconds}`;
+    // Display current time in real-time and set it in the hidden input field
+    function CurrentTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const formattedTime = `${hours}:${minutes}:${seconds}`;
 
-                // Update the displayed time
-                document.getElementById('currentTime').innerText = formattedTime;
+        // Update the displayed time
+        document.getElementById('currentTime').innerText = formattedTime;
 
-                // Set the hidden input value to the current time
-                document.getElementById('currentTimeInput').value = formattedTime;
-            }
-            setInterval(CurrentTime, 1000); // Update every second
+        // Set the hidden input value to the current time
+        document.getElementById('currentTimeInput').value = formattedTime;
+    }
+    setInterval(CurrentTime, 1000); // Update every second
 
-            // Control visibility of each option based on time
-            function controlOptionVisibility() {
-                const now = new Date();
-                const hours = now.getHours();
-                const minutes = now.getMinutes();
-                const totalMinutes = hours * 60 + minutes;
+    // Control visibility of each option based on time
+    function controlOptionVisibility() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const totalMinutes = hours * 60 + minutes;
 
-                const options = document.querySelectorAll('#option1 option');
-                options.forEach(option => {
-                    const visibleFrom = parseInt(option.getAttribute('data-visible-from'), 10);
-                    const visibleUntil = parseInt(option.getAttribute('data-visible-until'), 10);
+        const options = document.querySelectorAll('#option1 option');
+        options.forEach(option => {
+            const visibleFrom = parseInt(option.getAttribute('data-visible-from'), 10);
+            const visibleUntil = parseInt(option.getAttribute('data-visible-until'), 10);
 
-                    if (totalMinutes >= visibleFrom && totalMinutes < visibleUntil) {
-                        option.style.display = 'block';
-                    } else {
-                        option.style.display = 'none';
-                    }
-                });
-            }
-
-            // Run the control function on load
-            controlOptionVisibility();
-
-            // Optionally, update the visibility every minute
-            setInterval(controlOptionVisibility, 60000);
-
-            // Control the visibility of the JUT option in the simplified dropdown
-            function updateConditionalOptionVisibility() {
-                const selectedOption = document.getElementById('option1').value;
-                const conditionalOption = document.getElementById('conditionalOption');
-                const jutOption = conditionalOption.querySelector('option[value="jut"]');
-
-                if (selectedOption.includes('Open')) {
-                    jutOption.style.display = 'block';
-                } else {
-                    jutOption.style.display = 'none';
-                }
-            }
-
-            // Function to update the visibility of sections based on dropdown selection
-            function updateSectionVisibility() {
-                const selectedOption = document.getElementById('conditionalOption').value;
-
-                // Hide all sections
-                document.querySelectorAll('.conditional-section').forEach(section => {
-                    section.style.display = 'none';
-                    // Uncheck all checkboxes when hiding sections
-                    section.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                });
-
-                // Show the relevant section based on the selected option
-                if (selectedOption === 'akda') {
-                    document.getElementById('akdaSection').style.display = 'block';
-                } else if (selectedOption === 'jut') {
-                    document.getElementById('jutSection').style.display = 'block';
-                } else if (selectedOption === 'pana') {
-                    document.getElementById('panaSection').style.display = 'block';
-                } else if (selectedOption === 'sp') {
-                    document.getElementById('spSection').style.display = 'block';
-                } else if (selectedOption === 'dp') {
-                    document.getElementById('dpSection').style.display = 'block';
-                }
-            }
-
-            // Function to enforce single checkbox selection
-            function enforceSingleCheckboxSelection(event) {
-                const checkboxes = document.querySelectorAll('.conditional-section input[type="checkbox"]');
-                if (event.target.type === 'checkbox') {
-                    checkboxes.forEach(checkbox => {
-                        if (checkbox !== event.target) {
-                            checkbox.checked = false;
-                        }
-                    });
-                }
-            }
-
-            // Add event listener for dropdown changes
-            document.getElementById('conditionalOption').addEventListener('change', updateSectionVisibility);
-
-            // Add event listener for when the option1 dropdown value changes
-            document.getElementById('option1').addEventListener('change', updateConditionalOptionVisibility);
-
-            // Add event listener to enforce single checkbox selection
-            document.querySelectorAll('.conditional-section input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', enforceSingleCheckboxSelection);
-            });
-
-            // Submit form function
-            window.submitForm = function(event) {
-                event.preventDefault(); // Prevent default form submission
-
-                var form = document.getElementById('myForm');
-                var formData = new FormData(form);
-
-                // Create a variable to store the selected checkbox value
-                var checkboxValue = null;
-
-                // Find the selected checkbox and get its value
-                var checkboxes = document.querySelectorAll('.conditional-section input[type="checkbox"]');
-                checkboxes.forEach(function(checkbox) {
-                    if (checkbox.checked) {
-                        checkboxValue = checkbox.value;
-                    }
-                });
-
-                // If a checkbox is selected, append its value to the form data
-                if (checkboxValue !== null) {
-                    formData.append('checkboxValue', checkboxValue);
-                }
-
-                fetch('https://script.google.com/macros/s/AKfycbxpC9ij1LOVCo18xhh5SRM0jHb-J05rxUmAfxBF9NvUCC44uW-2WvYcpiVkr-K2NhO6/exec', {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors' // Ensure CORS mode is set
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response here if needed
-                    console.log('Form submitted successfully:', data);
-                })
-                .catch(error => {
-                    console.error('Error submitting form:', error);
-                });
+            if (totalMinutes >= visibleFrom && totalMinutes < visibleUntil) {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
             }
         });
+    }
+
+    // Run the control function on load
+    controlOptionVisibility();
+
+    // Optionally, update the visibility every minute
+    setInterval(controlOptionVisibility, 60000);
+
+    // Control the visibility of the JUT option in the simplified dropdown
+    function updateConditionalOptionVisibility() {
+        const selectedOption = document.getElementById('option1').value;
+        const conditionalOption = document.getElementById('conditionalOption');
+        const jutOption = conditionalOption.querySelector('option[value="jut"]');
+
+        if (selectedOption.includes('Open')) {
+            jutOption.style.display = 'block';
+        } else {
+            jutOption.style.display = 'none';
+        }
+    }
+
+    // Function to update the visibility of sections based on dropdown selection
+    function updateSectionVisibility() {
+        const selectedOption = document.getElementById('conditionalOption').value;
+
+        // Hide all sections
+        document.querySelectorAll('.conditional-section').forEach(section => {
+            section.style.display = 'none';
+            // Uncheck all checkboxes when hiding sections
+            section.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+
+        // Show the relevant section based on the selected option
+        if (selectedOption === 'akda') {
+            document.getElementById('akdaSection').style.display = 'block';
+        } else if (selectedOption === 'jut') {
+            document.getElementById('jutSection').style.display = 'block';
+        } else if (selectedOption === 'pana') {
+            document.getElementById('panaSection').style.display = 'block';
+        } else if (selectedOption === 'sp') {
+            document.getElementById('spSection').style.display = 'block';
+        } else if (selectedOption === 'dp') {
+            document.getElementById('dpSection').style.display = 'block';
+        }
+    }
+
+    // Function to enforce single checkbox selection
+    function enforceSingleCheckboxSelection(event) {
+        const checkboxes = document.querySelectorAll('.conditional-section input[type="checkbox"]');
+        if (event.target.type === 'checkbox') {
+            checkboxes.forEach(checkbox => {
+                if (checkbox !== event.target) {
+                    checkbox.checked = false;
+                }
+            });
+        }
+    }
+
+    // Add event listener for dropdown changes
+    document.getElementById('conditionalOption').addEventListener('change', updateSectionVisibility);
+
+    // Add event listener for when the option1 dropdown value changes
+    document.getElementById('option1').addEventListener('change', updateConditionalOptionVisibility);
+
+    // Add event listener to enforce single checkbox selection
+    document.querySelectorAll('.conditional-section input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', enforceSingleCheckboxSelection);
+    });
+
+    // Submit form function
+    window.submitForm = function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        var form = document.getElementById('myForm');
+        var formData = new FormData(form);
+
+        // Create a variable to store the selected checkbox value
+        var checkboxValue = null;
+
+        // Find the selected checkbox and get its value
+        var checkboxes = document.querySelectorAll('.conditional-section input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                checkboxValue = checkbox.value;
+            }
+        });
+
+        // If a checkbox is selected, append its value to the form data
+        if (checkboxValue !== null) {
+            formData.append('checkboxValue', checkboxValue);
+        }
+
+        // Append currentTime and simpleDropdown values
+        const currentTime = document.getElementById('currentTimeInput').value;
+        const simpleDropdown = document.getElementById('simpleDropdown') ? document.getElementById('simpleDropdown').value : 'Unknown';
+
+        // Debugging logs
+   
+
+        formData.append('currentTime', currentTime);
+        formData.append('simpleDropdown', simpleDropdown);
+               
+        fetch('https://script.google.com/macros/s/AKfycbzoKussCwY1aI8IJPxEqtKBghNb_41spZ3P5zhPMCe6iGXzFwaYMkLMIFKw_OtQ34qC/exec', {
+            method: 'POST',
+            body: formData,
+            mode: 'cors' // Ensure CORS mode is set
+        })
+        .then(response => response.json())
+        .then(data => {
+            var messageDiv = document.getElementById('responseMessage');
+            if (data.result === 'success') {
+                alert('Form submitted successfully!'); // Success alert
+                location.reload(); // Auto-refresh the page
+            } else {
+                messageDiv.textContent = 'Error: ' + (data.message || 'An unknown error occurred.');
+                messageDiv.style.color = 'red';
+            }
+        })
+        .catch(error => {
+            var messageDiv = document.getElementById('responseMessage');
+            messageDiv.textContent = 'Error: ' + error.message;
+            messageDiv.style.color = 'red';
+        });
+    }
+});
+
     </script>
 
 
